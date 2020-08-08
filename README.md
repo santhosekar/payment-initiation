@@ -8,6 +8,9 @@ Payment-initation service help to  validate the below things:
    - 1.	White listed certificates validation 
    - 2.	Signature validation
    - 3.	Request validation
+   
+   Note:
+   - Mutual SSL has been implemented, so it has exposed in https port.Payment initiation service jks file in resource folder.
 
 ### Requirements
 
