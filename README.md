@@ -31,5 +31,5 @@ IntelliJ
 
 https://localhost:8090/payment
 
-(Note:Above the url navigate to simple html page with minimal validation like empty check only because test the behavior if payment -initation service.)
+(Note:Above the url navigate to simple html page with minimal validation like empty check only because test the behavior of actual  payment -initation service.)
   
