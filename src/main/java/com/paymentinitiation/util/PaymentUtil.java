@@ -1,7 +1,6 @@
 package com.paymentinitiation.util;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.LIMIT_EXCEEDED;
-import static com.paymentinitiation.constant.PaymentInitiationConstant.REGEX;
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
 
 import java.util.Set;
 
@@ -13,12 +12,15 @@ import javax.validation.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.paymentinitiation.exception.AmountLimitExceedException;
 import com.paymentinitiation.exception.InvalidRequestException;
 import com.paymentinitiation.implementation.CertificateValidationImpl;
 import com.paymentinitiation.model.PaymentDetails;
+import com.paymentinitiation.model.ResponseCode;
 import com.paymentinitiation.model.ValidationModel;
 
 @Component
@@ -26,7 +28,8 @@ public class PaymentUtil {
   @Autowired
   public CertificateValidationImpl certificateValidation;
   Logger logger = LoggerFactory.getLogger(PaymentUtil.class);
-  String violationFields=null;
+  String violationFields = null;
+
   public Integer getSumValue(String num) {
     logger.info("Entering getSumValue");
     char[] numbers = num.toCharArray();
@@ -74,4 +77,19 @@ public class PaymentUtil {
       throw new AmountLimitExceedException(LIMIT_EXCEEDED);
     }
   }
+
+  public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
+      String certificate, String publicKey) throws Exception {
+    ValidationModel validationModel;
+    validationModel = getViolationsCount(paymentDetails);
+    if (validationModel != null && validationModel.getValidationCount() == 0
+        && isWhiteListed(certificate, publicKey) && isValidLimit(paymentDetails)) {
+      return new ResponseEntity<>(new ResponseCode(TRANSACTION_CODE, ACCEPTED), HttpStatus.CREATED);
+    } else {
+      throw new Exception(INTERNAL_SERVER_ERROR);
+    }
+
+  }
+
+
 }

@@ -1,5 +1,8 @@
 package com.paymentinitiation.configure;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,34 +14,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = X509AuthenticationServer.class)
 public class X509AuthenticationServerTest {
 
-    private MockMvc mockMvc;
+  private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private FilterChainProxy springSecurityFilterChain;
+  @Autowired
+  private FilterChainProxy springSecurityFilterChain;
 
-    @Before
-    public void setup() throws Exception {
-        mockMvc = webAppContextSetup(webApplicationContext)
-                .addFilter(springSecurityFilterChain)
-                .build();
-    }
+  @Before
+  public void setup() throws Exception {
+    mockMvc =
+        webAppContextSetup(webApplicationContext).addFilter(springSecurityFilterChain).build();
+  }
 
   @Test
   public void TestConfigNoProperCN() throws Exception {
 
-      mockMvc
-              .perform(MockMvcRequestBuilders.post("/initiate-payment"))
-              .andExpect(status().is4xxClientError());
+    mockMvc.perform(MockMvcRequestBuilders.post("/initiate-payment"))
+        .andExpect(status().is4xxClientError());
   }
 }
