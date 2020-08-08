@@ -1,5 +1,6 @@
 package com.paymentinitiation.util;
 
+import static com.paymentinitiation.constant.PaymentInitiationConstant.LIMIT_EXCEEDED;
 import static com.paymentinitiation.constant.PaymentInitiationConstant.REGEX;
 
 import java.util.Set;
@@ -70,7 +71,7 @@ public class PaymentUtil {
     if (amount > 0 && (getSumValue(debitIban) % paymentDetails.getDebtorIBAN().length()) == 0) {
       return true;
     } else {
-      throw new AmountLimitExceedException("LIMIT_EXCEEDED");
+      throw new AmountLimitExceedException(LIMIT_EXCEEDED);
     }
   }
 }

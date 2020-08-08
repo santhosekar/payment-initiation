@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.ACCEPTED;
-import static com.paymentinitiation.constant.PaymentInitiationConstant.TRANSACTION_CODE;
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
 
 @RestController
 public class PaymentInitiationController {
@@ -40,7 +39,7 @@ public class PaymentInitiationController {
         && paymentUtil.isValidLimit(paymentDetails)) {
       return new ResponseEntity<>(new ResponseCode(TRANSACTION_CODE, ACCEPTED), HttpStatus.CREATED);
     } else {
-      throw new Exception("Internal error");
+      throw new Exception(INTERNAL_SERVER_ERROR);
     }
   }
 

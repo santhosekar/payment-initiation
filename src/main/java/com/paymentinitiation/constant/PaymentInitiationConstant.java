@@ -12,6 +12,6 @@ public final class PaymentInitiationConstant {
     public static final String INVALID_SIGNATURE = "INVALID_SIGNATURE";
     public static final String LIMIT_EXCEEDED = "LIMIT_EXCEEDED";
     public static final String UNKNOWN_CERTIFICATE = "UNKNOWN_CERTIFICATE";
-    public static final String INTERNAL_SERVER_ERROR = "INTERNAL SERVER ERROR";
+    public static final String INTERNAL_SERVER_ERROR = "GENERAL_ERROR";
 
 }
