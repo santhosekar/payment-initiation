@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: payment-initation
+---
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    client-auth: need
+    key-store: classpath:payment-server.jks
+    key-store-password: sandbox
+    key-alias: payment-server
+    key-store-type: JKS
+    key-store-provider: SUN
+    trust-store: classpath:payment-server.jks
+    trust-store-password: sandbox
+    trust-store-type: JKS
