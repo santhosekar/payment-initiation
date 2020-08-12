@@ -20,8 +20,8 @@ Payment-initation service help to  validate the below things:
 
 ### Run the application
 
- -  First ./gradlew build will make common library to be compiled and ready to use.
-  - Second, ./gradlew :search:bootRun will make the application to run on port 8443 (note it secure port https)
+ -  First gradle build will make common library to be compiled and ready to use.
+  - Second, gradle bootRun will make the application to run on port 8443 (note it secure port https)
    
 
 ### Testing the application
