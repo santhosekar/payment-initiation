@@ -14,8 +14,9 @@ Payment-initation service help to  validate the below things:
 
 ### Requirements
 
-Gradle
-IntelliJ
+-Gradle
+
+-IntelliJ
 
 ### Run the application
 
