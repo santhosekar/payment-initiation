@@ -9,6 +9,8 @@ public final class PaymentInitiationConstant {
   public static final String RSA = "RSA";
   public static final String SHA_1_WITH_RSA = "SHA1withRSA";
   public static final String ENTERING_METHOD_NAME_IS = "Entering method name is : {}";
+  public static final String ROLE_ADMIN = "ROLE_ADMIN";
+  public static final String PASSWORD = "";
 
 
   PaymentInitiationConstant() {

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ValidationModel {
+public class ValidationResponse {
   private Integer validationCount;
   private String validationMessage;
 }

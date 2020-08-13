@@ -1,8 +1,5 @@
 package com.paymentinitiation.config;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.CN_REGEX;
-import static com.paymentinitiation.constant.PaymentInitiationConstant.SANDBOX_TPP;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +14,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import com.paymentinitiation.enums.ErrorReasonCode;
 import com.paymentinitiation.exception.UnknownCertificateException;
 
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
+
 @EnableWebSecurity
 public class ApplicationConfig extends WebSecurityConfigurerAdapter {
+
 
   Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
@@ -43,8 +43,8 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
       if (username != null) {
         if (SANDBOX_TPP.equalsIgnoreCase(username)) {
           logger.info("user name is : {}", username);
-          return new User(username, "",
-              AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN"));
+          return new User(username, PASSWORD,
+              AuthorityUtils.commaSeparatedStringToAuthorityList(ROLE_ADMIN));
 
         } else {
           logger.info("UserDetailsService getting exception : {}",

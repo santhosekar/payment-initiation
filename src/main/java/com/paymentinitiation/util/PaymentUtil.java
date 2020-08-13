@@ -26,7 +26,7 @@ import com.paymentinitiation.exception.InvalidRequestException;
 import com.paymentinitiation.implementation.CertificateValidationImpl;
 import com.paymentinitiation.model.PaymentDetails;
 import com.paymentinitiation.model.ResponseCode;
-import com.paymentinitiation.model.ValidationModel;
+import com.paymentinitiation.model.ValidationResponse;
 
 @Component
 public class PaymentUtil {
@@ -35,16 +35,16 @@ public class PaymentUtil {
   Logger logger = LoggerFactory.getLogger(PaymentUtil.class);
   String violationFields = null;
 
-  public Integer getSumValue(String num) {
+  public Integer getSumValue(String account) {
     logger.debug(ENTERING_METHOD_NAME_IS, "getSumValue");
-    return Arrays.stream(num.split(" ")).filter(s -> s.matches("\\d+")).mapToInt(Integer::parseInt)
-        .sum();
+    return Arrays.stream(account.split("")).filter(s -> s.matches("\\d+"))
+        .mapToInt(Integer::valueOf).sum();
   }
 
-  public ValidationModel getViolationsCount(PaymentDetails paymentDetails) {
+  public ValidationResponse getViolations(PaymentDetails paymentDetails) {
     logger.debug(ENTERING_METHOD_NAME_IS, "getViolationsCount");
     violationFields = "Following fields are not valid: ";
-    ValidationModel validationModel = new ValidationModel();
+    ValidationResponse validationResponse = new ValidationResponse();
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
     Set<ConstraintViolation<PaymentDetails>> violations = validator.validate(paymentDetails);
@@ -54,8 +54,8 @@ public class PaymentUtil {
       logger.info("ValidationModel getting exception : {}", violationFields);
       throw new InvalidRequestException(violationFields);
     } else {
-      validationModel.setValidationCount(0);
-      return validationModel;
+      validationResponse.setValidationCount(0);
+      return validationResponse;
     }
   }
 
@@ -77,9 +77,9 @@ public class PaymentUtil {
   public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
       String certificate, String publicKey) throws IOException {
     logger.debug(ENTERING_METHOD_NAME_IS, "isValidPaymentRequest");
-    ValidationModel validationModel;
-    validationModel = getViolationsCount(paymentDetails);
-    if (validationModel != null && validationModel.getValidationCount() == 0
+    ValidationResponse validationResponse;
+    validationResponse = getViolations(paymentDetails);
+    if (validationResponse != null && validationResponse.getValidationCount() == 0
         && isWhiteListed(certificate, publicKey) && isValidLimit(paymentDetails)) {
       return new ResponseEntity<>(
           new ResponseCode(TRANSACTION_CODE, TransactionStatus.ACCEPTED.getStatus()),
