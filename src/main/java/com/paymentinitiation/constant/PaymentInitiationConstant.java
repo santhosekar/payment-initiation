@@ -2,10 +2,6 @@ package com.paymentinitiation.constant;
 
 public final class PaymentInitiationConstant {
 
-  PaymentInitiationConstant(){
-
-  }
-
   public static final String CN_REGEX = "CN=(.*?)(?:,|$)";
   public static final String SANDBOX_TPP = "Sandbox-TPP";
   public static final String TRANSACTION_CODE = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
@@ -17,5 +13,8 @@ public final class PaymentInitiationConstant {
   public static final String LIMIT_EXCEEDED = "LIMIT_EXCEEDED";
   public static final String UNKNOWN_CERTIFICATE = "UNKNOWN_CERTIFICATE";
   public static final String INTERNAL_SERVER_ERROR = "GENERAL_ERROR";
+  PaymentInitiationConstant() {
+
+  }
 
 }

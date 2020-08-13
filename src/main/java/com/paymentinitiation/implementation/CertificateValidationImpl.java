@@ -1,17 +1,18 @@
 package com.paymentinitiation.implementation;
 
-import com.paymentinitiation.exception.GeneralException;
-import com.paymentinitiation.service.CertificateValidation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import com.paymentinitiation.exception.GeneralException;
+import com.paymentinitiation.service.CertificateValidation;
 
 @Component
 public class CertificateValidationImpl implements CertificateValidation {
@@ -20,7 +21,7 @@ public class CertificateValidationImpl implements CertificateValidation {
   List<byte[]> certificateList;
 
   @Override
-  public boolean checkWhiteListedCertificate(String certificate, String publicKey)  {
+  public boolean checkWhiteListedCertificate(String certificate, String publicKey) {
     logger.debug("Entering checkWhiteListedCertificate");
     try {
       byte[] bytePubKey = Base64.getDecoder().decode(certificate);
@@ -38,7 +39,8 @@ public class CertificateValidationImpl implements CertificateValidation {
 
   }
 
-  private boolean verifySignature(byte[] data, byte[] signature, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+  private boolean verifySignature(byte[] data, byte[] signature, PublicKey publicKey)
+      throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     logger.debug("Entering verifySignature");
     Signature sig = Signature.getInstance("SHA1withRSA");
     sig.initVerify(publicKey);

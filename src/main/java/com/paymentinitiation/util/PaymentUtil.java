@@ -9,7 +9,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import com.paymentinitiation.exception.GeneralException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.paymentinitiation.exception.AmountLimitExceedException;
+import com.paymentinitiation.exception.GeneralException;
 import com.paymentinitiation.exception.InvalidRequestException;
 import com.paymentinitiation.implementation.CertificateValidationImpl;
 import com.paymentinitiation.model.PaymentDetails;
@@ -80,7 +80,7 @@ public class PaymentUtil {
   }
 
   public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
-      String certificate, String publicKey)  {
+      String certificate, String publicKey) {
     ValidationModel validationModel;
     validationModel = getViolationsCount(paymentDetails);
     if (validationModel != null && validationModel.getValidationCount() == 0

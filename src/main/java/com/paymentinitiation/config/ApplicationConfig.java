@@ -29,8 +29,8 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     logger.debug("Started configure");
-    http.x509().subjectPrincipalRegex(CN_REGEX).and().authorizeRequests().anyRequest().authenticated()
-        .and().userDetailsService(userDetailsService()).csrf().disable();
+    http.x509().subjectPrincipalRegex(CN_REGEX).and().authorizeRequests().anyRequest()
+        .authenticated().and().userDetailsService(userDetailsService()).csrf().disable();
     logger.debug("Exiting configure");
   }
 

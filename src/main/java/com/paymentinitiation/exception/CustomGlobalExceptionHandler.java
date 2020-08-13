@@ -75,7 +75,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
   @ExceptionHandler(Exception.class)
   public final ResponseEntity<ExceptionResponse> handleCommonException(Exception ex,
-                                                                        WebRequest request) {
+      WebRequest request) {
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
