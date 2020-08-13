@@ -62,8 +62,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
   }
 
 
-  @ExceptionHandler(Exception.class)
-  public final ResponseEntity<ExceptionResponse> handleGeneralException(Exception ex,
+  @ExceptionHandler(GeneralException.class)
+  public final ResponseEntity<ExceptionResponse> handleGeneralException(GeneralException ex,
       WebRequest request) {
 
     ExceptionResponse error = new ExceptionResponse();
@@ -72,6 +72,18 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     error.setStatus(REJECTED);
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
+  @ExceptionHandler(Exception.class)
+  public final ResponseEntity<ExceptionResponse> handleCommonException(Exception ex,
+                                                                        WebRequest request) {
+
+    ExceptionResponse error = new ExceptionResponse();
+    error.setReason(ex.getMessage());
+    error.setReasonCode(INTERNAL_SERVER_ERROR);
+    error.setStatus(REJECTED);
+    return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
 
 
 }

@@ -9,6 +9,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import com.paymentinitiation.exception.GeneralException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class PaymentUtil {
     Set<ConstraintViolation<PaymentDetails>> violations = validator.validate(paymentDetails);
     violations.forEach(paymentDetailsConstraintViolation -> violationFields +=
         paymentDetailsConstraintViolation.getPropertyPath() + ",");
-    if (violations.size() > 0) {
+    if (!violations.isEmpty()) {
       throw new InvalidRequestException(violationFields);
     } else {
       validationModel.setValidationCount(0);
@@ -64,7 +65,7 @@ public class PaymentUtil {
     }
   }
 
-  public boolean isWhiteListed(String certificate, String publicKey) throws Exception {
+  public boolean isWhiteListed(String certificate, String publicKey) {
     return certificateValidation.checkWhiteListedCertificate(certificate, publicKey);
   }
 
@@ -79,14 +80,14 @@ public class PaymentUtil {
   }
 
   public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
-      String certificate, String publicKey) throws Exception {
+      String certificate, String publicKey)  {
     ValidationModel validationModel;
     validationModel = getViolationsCount(paymentDetails);
     if (validationModel != null && validationModel.getValidationCount() == 0
         && isWhiteListed(certificate, publicKey) && isValidLimit(paymentDetails)) {
       return new ResponseEntity<>(new ResponseCode(TRANSACTION_CODE, ACCEPTED), HttpStatus.CREATED);
     } else {
-      throw new Exception(INTERNAL_SERVER_ERROR);
+      throw new GeneralException(INTERNAL_SERVER_ERROR);
     }
 
   }

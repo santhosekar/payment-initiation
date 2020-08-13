@@ -2,7 +2,11 @@ package com.paymentinitiation.constant;
 
 public final class PaymentInitiationConstant {
 
-  public static final String CN_$ = "CN=(.*?)(?:,|$)";
+  PaymentInitiationConstant(){
+
+  }
+
+  public static final String CN_REGEX = "CN=(.*?)(?:,|$)";
   public static final String SANDBOX_TPP = "Sandbox-TPP";
   public static final String TRANSACTION_CODE = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
   public static final String ACCEPTED = "Accepted";

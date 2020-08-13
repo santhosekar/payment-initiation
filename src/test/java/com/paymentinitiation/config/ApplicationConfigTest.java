@@ -1,4 +1,4 @@
-package com.paymentinitiation.configure;
+package com.paymentinitiation.config;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -16,8 +16,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = X509AuthenticationServer.class)
-public class X509AuthenticationServerTest {
+@SpringBootTest(classes = ApplicationConfig.class)
+public class ApplicationConfigTest {
 
   private MockMvc mockMvc;
 

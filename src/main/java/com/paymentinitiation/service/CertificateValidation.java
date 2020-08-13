@@ -2,6 +2,6 @@ package com.paymentinitiation.service;
 
 public interface CertificateValidation {
 
-  boolean checkWhiteListedCertificate(String certificate, String publicKey) throws Exception;
+  boolean checkWhiteListedCertificate(String certificate, String publicKey);
 
 }

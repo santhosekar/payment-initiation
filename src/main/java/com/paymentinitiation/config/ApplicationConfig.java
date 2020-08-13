@@ -1,6 +1,6 @@
-package com.paymentinitiation.configure;
+package com.paymentinitiation.config;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.CN_$;
+import static com.paymentinitiation.constant.PaymentInitiationConstant.CN_REGEX;
 import static com.paymentinitiation.constant.PaymentInitiationConstant.SANDBOX_TPP;
 
 import org.slf4j.Logger;
@@ -17,9 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import com.paymentinitiation.exception.UnknownCertificateException;
 
 @EnableWebSecurity
-public class X509AuthenticationServer extends WebSecurityConfigurerAdapter {
+public class ApplicationConfig extends WebSecurityConfigurerAdapter {
 
-  Logger logger = LoggerFactory.getLogger(X509AuthenticationServer.class);
+  Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -29,31 +29,29 @@ public class X509AuthenticationServer extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     logger.debug("Started configure");
-    http.x509().subjectPrincipalRegex(CN_$).and().authorizeRequests().anyRequest().authenticated()
+    http.x509().subjectPrincipalRegex(CN_REGEX).and().authorizeRequests().anyRequest().authenticated()
         .and().userDetailsService(userDetailsService()).csrf().disable();
     logger.debug("Exiting configure");
   }
 
   @Bean
+  @Override
   public UserDetailsService userDetailsService() {
     logger.debug("Started UserDetailsService");
-    return new UserDetailsService() {
-      @Override
-      public User loadUserByUsername(String username) {
-        if (username != null) {
-          if (SANDBOX_TPP.equalsIgnoreCase(username)) {
-            logger.debug("Valid user");
-            return new User(username, "",
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN"));
+    return username -> {
+      if (username != null) {
+        if (SANDBOX_TPP.equalsIgnoreCase(username)) {
+          logger.debug("Valid user");
+          return new User(username, "",
+              AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN"));
 
-          } else {
-            logger.debug("<------UNKNOWN_CERTIFICATE------>");
-            throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
-          }
+        } else {
+          logger.debug("<------UNKNOWN_CERTIFICATE------>");
+          throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
         }
-        logger.debug("<------UNKNOWN_CERTIFICATE------>");
-        throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
       }
+      logger.debug("<------UNKNOWN_CERTIFICATE------>");
+      throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
     };
   }
 }
