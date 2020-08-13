@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.paymentinitiation.enums.ErrorReasonCode;
 import com.paymentinitiation.exception.UnknownCertificateException;
 
 @EnableWebSecurity
@@ -28,30 +29,33 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    logger.debug("Started configure");
+    logger.debug("Entering method name is : {}", "configure");
     http.x509().subjectPrincipalRegex(CN_REGEX).and().authorizeRequests().anyRequest()
         .authenticated().and().userDetailsService(userDetailsService()).csrf().disable();
-    logger.debug("Exiting configure");
+    logger.debug("Exiting method name is : {}", "configure");
   }
 
   @Bean
   @Override
   public UserDetailsService userDetailsService() {
-    logger.debug("Started UserDetailsService");
+    logger.debug("Entering method name is : {}", "UserDetailsService");
     return username -> {
       if (username != null) {
         if (SANDBOX_TPP.equalsIgnoreCase(username)) {
-          logger.debug("Valid user");
+          logger.info("user name is : {}", username);
           return new User(username, "",
               AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN"));
 
         } else {
-          logger.debug("<------UNKNOWN_CERTIFICATE------>");
-          throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
+          logger.info("UserDetailsService getting exception : {}",
+              ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
+          throw new UnknownCertificateException(
+              ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
         }
       }
-      logger.debug("<------UNKNOWN_CERTIFICATE------>");
-      throw new UnknownCertificateException("UNKNOWN_CERTIFICATE");
+      logger.info("UserDetailsService getting exception : {}",
+          ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
+      throw new UnknownCertificateException(ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
     };
   }
 }

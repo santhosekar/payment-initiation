@@ -1,13 +1,14 @@
 package com.paymentinitiation.exception;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.paymentinitiation.enums.ErrorReasonCode;
+import com.paymentinitiation.enums.TransactionStatus;
 
 
 @ControllerAdvice
@@ -16,13 +17,13 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
 
   @ExceptionHandler(InvalidRequestException.class)
-  public final ResponseEntity<ExceptionResponse> handleInvalid(InvalidRequestException ex,
+  public final ResponseEntity<ExceptionResponse> handleInvalidException(InvalidRequestException ex,
       WebRequest request) {
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(INVALID_REASON_CODE);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.INVALID_REQUEST.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
 
@@ -33,31 +34,31 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(UNKNOWN_CERTIFICATE);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(AmountLimitExceedException.class)
-  public final ResponseEntity<ExceptionResponse> handleUnknownAmount(AmountLimitExceedException ex,
-      WebRequest request) {
+  public final ResponseEntity<ExceptionResponse> handleAmountLimitExceedException(
+      AmountLimitExceedException ex, WebRequest request) {
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(LIMIT_EXCEEDED);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.LIMIT_EXCEEDED.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
 
   @ExceptionHandler(InvalidCertificateException.class)
-  public final ResponseEntity<ExceptionResponse> handleInvalid(InvalidCertificateException ex,
-      WebRequest request) {
+  public final ResponseEntity<ExceptionResponse> handleInvalidCertificateException(
+      InvalidCertificateException ex, WebRequest request) {
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(INVALID_SIGNATURE);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.INVALID_SIGNATURE.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
 
@@ -68,8 +69,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(INTERNAL_SERVER_ERROR);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.GENERAL_ERROR.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
@@ -79,8 +80,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     ExceptionResponse error = new ExceptionResponse();
     error.setReason(ex.getMessage());
-    error.setReasonCode(INTERNAL_SERVER_ERROR);
-    error.setStatus(REJECTED);
+    error.setReasonCode(ErrorReasonCode.GENERAL_ERROR.getReasonCode());
+    error.setStatus(TransactionStatus.REJECTED.getStatus());
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 

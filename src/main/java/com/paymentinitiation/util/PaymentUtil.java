@@ -2,6 +2,8 @@ package com.paymentinitiation.util;
 
 import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -16,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.paymentinitiation.enums.ErrorReasonCode;
+import com.paymentinitiation.enums.TransactionStatus;
 import com.paymentinitiation.exception.AmountLimitExceedException;
 import com.paymentinitiation.exception.GeneralException;
 import com.paymentinitiation.exception.InvalidRequestException;
@@ -32,23 +36,13 @@ public class PaymentUtil {
   String violationFields = null;
 
   public Integer getSumValue(String num) {
-    logger.info("Entering getSumValue");
-    char[] numbers = num.toCharArray();
-    int sum = 0;
-    for (char a : numbers) {
-      if (Character.isDigit(a)) {
-        String s1 = Character.toString(a);
-        int i1 = Integer.parseInt(s1);
-
-        sum = sum + i1;
-      }
-    }
-
-    return sum;
+    logger.debug(ENTERING_METHOD_NAME_IS, "getSumValue");
+    return Arrays.stream(num.split(" ")).filter(s -> s.matches("\\d+")).mapToInt(Integer::parseInt)
+        .sum();
   }
 
   public ValidationModel getViolationsCount(PaymentDetails paymentDetails) {
-
+    logger.debug(ENTERING_METHOD_NAME_IS, "getViolationsCount");
     violationFields = "Following fields are not valid: ";
     ValidationModel validationModel = new ValidationModel();
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -57,15 +51,16 @@ public class PaymentUtil {
     violations.forEach(paymentDetailsConstraintViolation -> violationFields +=
         paymentDetailsConstraintViolation.getPropertyPath() + ",");
     if (!violations.isEmpty()) {
+      logger.info("ValidationModel getting exception : {}", violationFields);
       throw new InvalidRequestException(violationFields);
     } else {
       validationModel.setValidationCount(0);
-      logger.debug("violations-->" + violations.size());
       return validationModel;
     }
   }
 
-  public boolean isWhiteListed(String certificate, String publicKey) {
+  public boolean isWhiteListed(String certificate, String publicKey) throws IOException {
+    logger.debug(ENTERING_METHOD_NAME_IS, "isWhiteListed");
     return certificateValidation.checkWhiteListedCertificate(certificate, publicKey);
   }
 
@@ -75,19 +70,22 @@ public class PaymentUtil {
     if (amount > 0 && (getSumValue(debitIban) % paymentDetails.getDebtorIBAN().length()) == 0) {
       return true;
     } else {
-      throw new AmountLimitExceedException(LIMIT_EXCEEDED);
+      throw new AmountLimitExceedException(ErrorReasonCode.LIMIT_EXCEEDED.getReasonCode());
     }
   }
 
   public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
-      String certificate, String publicKey) {
+      String certificate, String publicKey) throws IOException {
+    logger.debug(ENTERING_METHOD_NAME_IS, "isValidPaymentRequest");
     ValidationModel validationModel;
     validationModel = getViolationsCount(paymentDetails);
     if (validationModel != null && validationModel.getValidationCount() == 0
         && isWhiteListed(certificate, publicKey) && isValidLimit(paymentDetails)) {
-      return new ResponseEntity<>(new ResponseCode(TRANSACTION_CODE, ACCEPTED), HttpStatus.CREATED);
+      return new ResponseEntity<>(
+          new ResponseCode(TRANSACTION_CODE, TransactionStatus.ACCEPTED.getStatus()),
+          HttpStatus.CREATED);
     } else {
-      throw new GeneralException(INTERNAL_SERVER_ERROR);
+      throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.getReasonCode());
     }
 
   }

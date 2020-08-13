@@ -1,5 +1,7 @@
 package com.paymentinitiation.controller;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,9 @@ public class PaymentInitiationController {
   public ResponseEntity<ResponseCode> processRequest(@RequestBody PaymentDetails paymentDetails,
       @RequestHeader(value = "X-Request-Id") String requestId,
       @RequestHeader(value = "Signature-Certificate") String certificate,
-      @RequestHeader(value = "Signature") String publicKey) throws Exception {
-    logger.info("Entering processRequest");
-    logger.debug("requestId-->" + requestId);
+      @RequestHeader(value = "Signature") String publicKey) throws IOException {
+    logger.debug("Entering method name is : {}", "processRequest");
+    logger.debug("Payment request id is: {}", requestId);
 
     return paymentUtil.isValidPaymentRequest(paymentDetails, certificate, publicKey);
 
