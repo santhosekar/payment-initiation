@@ -1,5 +1,7 @@
 package com.paymentinitiation.config;
 
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.paymentinitiation.enums.ErrorReasonCode;
 import com.paymentinitiation.exception.UnknownCertificateException;
-
-import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
 
 @EnableWebSecurity
 public class ApplicationConfig extends WebSecurityConfigurerAdapter {
