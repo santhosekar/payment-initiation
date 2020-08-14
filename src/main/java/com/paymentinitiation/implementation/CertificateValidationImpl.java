@@ -76,23 +76,6 @@ public class CertificateValidationImpl implements CertificateValidation {
   }
 
 
-  private byte[] convertObjectIntoBytes(PaymentDetails paymentDetails) throws Exception {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    ObjectOutputStream out = null;
-    try {
-      out = new ObjectOutputStream(bos);
-      out.writeObject(paymentDetails);
-      out.flush();
-      return bos.toByteArray();
-    } catch (Exception ex) {
-      if (out != null) {
-        out.close();
-      }
-      bos.close();
-      throw new GeneralException(ex.getMessage());
-    }
-
-  }
-
+ 
 
 }
