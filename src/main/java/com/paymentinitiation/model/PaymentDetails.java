@@ -1,5 +1,7 @@
 package com.paymentinitiation.model;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -8,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PaymentDetails {
+public class PaymentDetails implements Serializable {
   @NotNull
   @Pattern(regexp = "[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}", message = "INVALID_REQUEST")
   private String debtorIBAN;

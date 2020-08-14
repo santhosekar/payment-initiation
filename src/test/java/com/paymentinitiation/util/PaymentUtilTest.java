@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.paymentinitiation.exception.AmountLimitExceedException;
 import com.paymentinitiation.exception.InvalidRequestException;
+import com.paymentinitiation.model.PaymentDetails;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -32,13 +33,13 @@ public class PaymentUtilTest {
   @Test
   public void getViolation() {
     Assert.assertEquals(Integer.valueOf("0"),
-        paymentUtil.getViolationsCount(getPaymentValue()).getValidationCount());
+        paymentUtil.getViolations(getPaymentValue()).getValidationCount());
   }
 
   @Test(expected = InvalidRequestException.class)
   public void getViolationError() {
     Assert.assertEquals(Integer.valueOf("0"),
-        paymentUtil.getViolationsCount(getPaymentValueError()).getValidationCount());
+        paymentUtil.getViolations(getPaymentValueError()).getValidationCount());
   }
 
   @Test(expected = AmountLimitExceedException.class)
@@ -53,24 +54,30 @@ public class PaymentUtilTest {
 
   @Test
   public void getCertificate() throws Exception {
-    String public_signature =
-        "rO0ABXNyABNqYXZhLnV0aWwuQXJyYXlMaXN0eIHSHZnHYZ0DAAFJAARzaXpleHAAAAACdwQAAAACdXIAAltCrPMX+AYIVOACAAB4cAAAABE2Mis2NTY1KyxkYXNkYXNkYXVxAH4AAgAAAICMRIdu+U7jG74rtVBlGiHxErMYluIMP8PH3vSh9aYSImgIu0qGS3UeRyBTjNmds/07Sxna/qLfsbfgXu2sT03v0J6x+X28e1Fv79fWaigwsKQfD2nM/2Z4tPT1iW46eDBWOjgGkZE6jbOW8/2PlArCipsIkj0GghQqRrLCYoNdpng=";
-    String public_key =
-        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKm2+hmexuHrDavwMJ6z90oCoLshmtvdlpqpqQS0bIBCpzKIr8f8dwj5+E0cnrNvBRplf/DkfnbnbLyF3YBYlhjOFVjJ/2JhHrqIgJt45QmbTbvYh8AEJ8Wlr1vn4eJL3xWrlh8J39e9FeH4ZGQnQUMh+Uj7FNaXW+a1NSRYCVJQIDAQAB";
-    Assert.assertEquals(true, paymentUtil.isWhiteListed(public_key, public_signature));
+    PaymentDetails paymentDetails = new PaymentDetails();
+    paymentDetails.setDebtorIBAN("NL02RABO0000001555");
+    paymentDetails.setCreditorIBAN("NL94ABNA1008270121");
+    paymentDetails.setCurrency("EUR");
+    paymentDetails.setAmount("1");
+    String signature =
+        "rO0ABXNyABNqYXZhLnV0aWwuQXJyYXlMaXN0eIHSHZnHYZ0DAAFJAARzaXpleHAAAAACdwQAAAACdXIAAltCrPMX+AYIVOACAAB4cAAAABYxMjMtMTIzLTQ1NixbQkA1YTEwNDExdXEAfgACAAABAGgIKnaNm0A0ANX3jWqFL4VqCHDeua/NjENvwwdzJ4JC13rUV4Uaz09m3IjWM7/oi2g1iTCQodqtinhExi4daSUYZw5tts+IfZ0beUfetKbrBdzqE2XYeoW7L5kTffrSCZDA6ATJ36ky109UyzjsatCISIXpoG/+HZUIed+ss3mLfHEJCuRBFK4IJeJw7ygeKrmg09cBfj49YHdhtM/2gcmf5mTPWAGth2AgF5daNVbE4HnMb8JuNw+s9cScq/WunLzEei4yfMOymz8FaAi15T6DCE1Fr32O0GEersMp+EsM/y7WZX+9MBxSMT7o+Hy8bcKYm4cOe0zRn1T0ijV7ZQl4";
+    String certificate =
+        "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDeXpDQ0FiT2dBd0lCQWdJRUh4eXhhREFOQmdrcWhraUc5dzBCQVFzRkFEQVdNUlF3RWdZRFZRUURFd3RUDQpZVzVrWW05NExWUlFVREFlRncweU1EQTRNVE14TlRJNU5ERmFGdzB5TVRBNE1UTXhOVEk1TkRGYU1CWXhGREFTDQpCZ05WQkFNVEMxTmhibVJpYjNndFZGQlFNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDDQpBUUVBcytEWmZnUG9Ec3RZY1Q0dndZeGhPa0FNQVhudDhsMWR6RTVZSTFqRmpyMCtHT05ycUxTVXE3cGFEa0JCDQo5d1RMbU9uZjlJdXVSek1GalI5aS9NUG5GK3UyU0Z5UW9lcnMxaVArTXErbFN5TXNBWCtrQk9BeEhLc00ycC84DQoveGdIcFhXSDFHNStPaWpTUGZFZmxOdFJGK25ITERFTVVsM2JSUzBmeEhsZjl3TEkxeGlLUWZ6bVA1eldENHM0DQp6djlnZ2JuQWdyWGNvbG8weForRDJEYlFrNms2ZERrQTR6OTFNS1Z5Sk9CRmZrWE0zLzhBalVTS0J3a3RUeWNyDQpVRGozWlBsRnhQMi8wNU5oenRFY2JjNk5Xc1plUG9NT3FqTkdwenNheGMrNTFZQ0Q3U3A2OHVNUEd2UjExNUwzDQphb3IwK1Flb1BkLzdiMzBLOVBWcnd2aldtd0lEQVFBQm95RXdIekFkQmdOVkhRNEVGZ1FVSUpXTnlOOFI1UDlHDQpxbU5XNzZuSnhOMnZJM1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZ0cGpJMWk1K1VvZDJmNnhqK01NQlM3DQpLeUwyd0ZtSE5lYmI3UGhxbFoxbHoydEV6aEkya0VCa3U1SEpha2Y0UTdzNUN6cnNqelkrOWxwcXFGUVVtT0FJDQpMNlFqTHAzQVNhbG14U2dPUlh0M1NNNmJXS2FEbHF4d2lBSHFzUUJqTnpVZUNNako5SHFHRHBPMEdxTHNSa3hnDQpVRUliNVpMRXdFTCtGYkZpdUtSZ3ljRjFTS3o0dis4bXZ0aFUrNVU2ZmJjTTU4UmZYMk9laVZ0YytOTEJUbGgvDQp4bU9wV3FWa0xNWWhHRFZCejVZVklqYnFMM3BRTUI0UUNyNTA1UjFrbmFaY0hQVVV0Zkdjbk16L25Db0FPVWlZDQpRbkY2VWliQVZwNWVjN0JpeERrV0dZa3lVdzFmT3gzTHk0RmhSeWtLTXdKc2NDcW1jNUFtWlFDSU1WNHRLU1U9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=";
+    Assert.assertEquals(true,
+        paymentUtil.isWhiteListed(signature, certificate, paymentDetails, "123-123-456"));
   }
 
 
 
   @Test
   public void validPaymentRequest() throws Exception {
-    String public_signature =
-        "rO0ABXNyABNqYXZhLnV0aWwuQXJyYXlMaXN0eIHSHZnHYZ0DAAFJAARzaXpleHAAAAACdwQAAAACdXIAAltCrPMX+AYIVOACAAB4cAAAABE2Mis2NTY1KyxkYXNkYXNkYXVxAH4AAgAAAICMRIdu+U7jG74rtVBlGiHxErMYluIMP8PH3vSh9aYSImgIu0qGS3UeRyBTjNmds/07Sxna/qLfsbfgXu2sT03v0J6x+X28e1Fv79fWaigwsKQfD2nM/2Z4tPT1iW46eDBWOjgGkZE6jbOW8/2PlArCipsIkj0GghQqRrLCYoNdpng=";
-    String public_key =
-        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKm2+hmexuHrDavwMJ6z90oCoLshmtvdlpqpqQS0bIBCpzKIr8f8dwj5+E0cnrNvBRplf/DkfnbnbLyF3YBYlhjOFVjJ/2JhHrqIgJt45QmbTbvYh8AEJ8Wlr1vn4eJL3xWrlh8J39e9FeH4ZGQnQUMh+Uj7FNaXW+a1NSRYCVJQIDAQAB";
-
+    String signature =
+        "rO0ABXNyABNqYXZhLnV0aWwuQXJyYXlMaXN0eIHSHZnHYZ0DAAFJAARzaXpleHAAAAACdwQAAAACdXIAAltCrPMX+AYIVOACAAB4cAAAABYxMjMtMTIzLTQ1NixbQkA1YTEwNDExdXEAfgACAAABAGgIKnaNm0A0ANX3jWqFL4VqCHDeua/NjENvwwdzJ4JC13rUV4Uaz09m3IjWM7/oi2g1iTCQodqtinhExi4daSUYZw5tts+IfZ0beUfetKbrBdzqE2XYeoW7L5kTffrSCZDA6ATJ36ky109UyzjsatCISIXpoG/+HZUIed+ss3mLfHEJCuRBFK4IJeJw7ygeKrmg09cBfj49YHdhtM/2gcmf5mTPWAGth2AgF5daNVbE4HnMb8JuNw+s9cScq/WunLzEei4yfMOymz8FaAi15T6DCE1Fr32O0GEersMp+EsM/y7WZX+9MBxSMT7o+Hy8bcKYm4cOe0zRn1T0ijV7ZQl4";
+    String certificate =
+        "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDeXpDQ0FiT2dBd0lCQWdJRUh4eXhhREFOQmdrcWhraUc5dzBCQVFzRkFEQVdNUlF3RWdZRFZRUURFd3RUDQpZVzVrWW05NExWUlFVREFlRncweU1EQTRNVE14TlRJNU5ERmFGdzB5TVRBNE1UTXhOVEk1TkRGYU1CWXhGREFTDQpCZ05WQkFNVEMxTmhibVJpYjNndFZGQlFNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDDQpBUUVBcytEWmZnUG9Ec3RZY1Q0dndZeGhPa0FNQVhudDhsMWR6RTVZSTFqRmpyMCtHT05ycUxTVXE3cGFEa0JCDQo5d1RMbU9uZjlJdXVSek1GalI5aS9NUG5GK3UyU0Z5UW9lcnMxaVArTXErbFN5TXNBWCtrQk9BeEhLc00ycC84DQoveGdIcFhXSDFHNStPaWpTUGZFZmxOdFJGK25ITERFTVVsM2JSUzBmeEhsZjl3TEkxeGlLUWZ6bVA1eldENHM0DQp6djlnZ2JuQWdyWGNvbG8weForRDJEYlFrNms2ZERrQTR6OTFNS1Z5Sk9CRmZrWE0zLzhBalVTS0J3a3RUeWNyDQpVRGozWlBsRnhQMi8wNU5oenRFY2JjNk5Xc1plUG9NT3FqTkdwenNheGMrNTFZQ0Q3U3A2OHVNUEd2UjExNUwzDQphb3IwK1Flb1BkLzdiMzBLOVBWcnd2aldtd0lEQVFBQm95RXdIekFkQmdOVkhRNEVGZ1FVSUpXTnlOOFI1UDlHDQpxbU5XNzZuSnhOMnZJM1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZ0cGpJMWk1K1VvZDJmNnhqK01NQlM3DQpLeUwyd0ZtSE5lYmI3UGhxbFoxbHoydEV6aEkya0VCa3U1SEpha2Y0UTdzNUN6cnNqelkrOWxwcXFGUVVtT0FJDQpMNlFqTHAzQVNhbG14U2dPUlh0M1NNNmJXS2FEbHF4d2lBSHFzUUJqTnpVZUNNako5SHFHRHBPMEdxTHNSa3hnDQpVRUliNVpMRXdFTCtGYkZpdUtSZ3ljRjFTS3o0dis4bXZ0aFUrNVU2ZmJjTTU4UmZYMk9laVZ0YytOTEJUbGgvDQp4bU9wV3FWa0xNWWhHRFZCejVZVklqYnFMM3BRTUI0UUNyNTA1UjFrbmFaY0hQVVV0Zkdjbk16L25Db0FPVWlZDQpRbkY2VWliQVZwNWVjN0JpeERrV0dZa3lVdzFmT3gzTHk0RmhSeWtLTXdKc2NDcW1jNUFtWlFDSU1WNHRLU1U9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=";
     Assert.assertEquals(201,
-        paymentUtil.isValidPaymentRequest(getPaymentCorrect(), public_key, public_signature)
+        paymentUtil
+            .initiatePaymentRequest(getPaymentCorrect(), certificate, signature, "123-123-456")
             .getStatusCodeValue());
 
 

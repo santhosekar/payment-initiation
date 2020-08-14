@@ -53,8 +53,10 @@ public class PaymentInitiationControllerTest {
     ResponseEntity<ResponseCode> responseCode =
         new ResponseEntity("{ \"paymentId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n"
             + "  \"status\": \"Accepted\"}", HttpStatus.CREATED);
-    Mockito.when(paymentUtil.isValidPaymentRequest(Mockito.any(PaymentDetails.class),
-        Mockito.any(String.class), Mockito.any(String.class))).thenReturn(responseCode);
+    Mockito
+        .when(paymentUtil.initiatePaymentRequest(Mockito.any(PaymentDetails.class),
+            Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class)))
+        .thenReturn(responseCode);
     String inputJson = mapToJson(getPaymentValue());
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

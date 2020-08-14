@@ -59,9 +59,11 @@ public class PaymentUtil {
     }
   }
 
-  public boolean isWhiteListed(String certificate, String publicKey) throws IOException {
+  public boolean isWhiteListed(String signature, String certificate, PaymentDetails paymentDetails,
+      String paymentId) throws IOException {
     logger.debug(ENTERING_METHOD_NAME_IS, "isWhiteListed");
-    return certificateValidation.checkWhiteListedCertificate(certificate, publicKey);
+    return certificateValidation.CheckValidCertificate(certificate, signature, paymentDetails,
+        paymentId);
   }
 
   public boolean isValidLimit(PaymentDetails paymentDetails) {
@@ -74,13 +76,14 @@ public class PaymentUtil {
     }
   }
 
-  public ResponseEntity<ResponseCode> isValidPaymentRequest(PaymentDetails paymentDetails,
-      String certificate, String publicKey) throws IOException {
+  public ResponseEntity<ResponseCode> initiatePaymentRequest(PaymentDetails paymentDetails,
+      String certificate, String signature, String paymentId) throws IOException {
     logger.debug(ENTERING_METHOD_NAME_IS, "isValidPaymentRequest");
     ValidationResponse validationResponse;
     validationResponse = getViolations(paymentDetails);
     if (validationResponse != null && validationResponse.getValidationCount() == 0
-        && isWhiteListed(certificate, publicKey) && isValidLimit(paymentDetails)) {
+        && isWhiteListed(signature, certificate, paymentDetails, paymentId)
+        && isValidLimit(paymentDetails)) {
       return new ResponseEntity<>(
           new ResponseCode(TRANSACTION_CODE, TransactionStatus.ACCEPTED.getStatus()),
           HttpStatus.CREATED);

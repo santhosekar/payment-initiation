@@ -28,11 +28,11 @@ public class PaymentInitiationController {
   public ResponseEntity<ResponseCode> processRequest(@RequestBody PaymentDetails paymentDetails,
       @RequestHeader(value = "X-Request-Id") String requestId,
       @RequestHeader(value = "Signature-Certificate") String certificate,
-      @RequestHeader(value = "Signature") String publicKey) throws IOException {
+      @RequestHeader(value = "Signature") String signature) throws IOException {
     logger.debug("Entering method name is : {}", "processRequest");
     logger.debug("Payment request id is: {}", requestId);
 
-    return paymentUtil.isValidPaymentRequest(paymentDetails, certificate, publicKey);
+    return paymentUtil.initiatePaymentRequest(paymentDetails, certificate, signature, requestId);
 
   }
 
