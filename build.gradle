@@ -25,7 +25,6 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
     compile group: 'org.json', name: 'json', version: '20090211'
@@ -33,7 +32,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
-    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 dependencyManagement {
