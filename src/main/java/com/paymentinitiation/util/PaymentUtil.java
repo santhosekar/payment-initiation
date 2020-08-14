@@ -62,7 +62,7 @@ public class PaymentUtil {
   public boolean isWhiteListed(String signature, String certificate, PaymentDetails paymentDetails,
       String paymentId) throws IOException {
     logger.debug(ENTERING_METHOD_NAME_IS, "isWhiteListed");
-    return certificateValidation.CheckValidCertificate(certificate, signature, paymentDetails,
+    return certificateValidation.checkValidCertificate(certificate, signature, paymentDetails,
         paymentId);
   }
 

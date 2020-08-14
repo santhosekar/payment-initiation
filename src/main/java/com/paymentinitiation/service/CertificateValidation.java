@@ -6,7 +6,7 @@ import com.paymentinitiation.model.PaymentDetails;
 
 public interface CertificateValidation {
 
-  boolean CheckValidCertificate(String certificate, String publicKey, PaymentDetails paymentDetails,
+  boolean checkValidCertificate(String certificate, String publicKey, PaymentDetails paymentDetails,
       String paymentId) throws IOException;
 
 }

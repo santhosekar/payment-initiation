@@ -31,7 +31,7 @@ public class CertificateValidationImpl implements CertificateValidation {
   CertificateFactory certificateFactory;
 
   @Override
-  public boolean CheckValidCertificate(String certificate, String signature,
+  public boolean checkValidCertificate(String certificate, String signature,
       PaymentDetails paymentDetails, String paymentId) throws IOException {
     logger.debug("Entering method name is : {}", "CheckValidCertificate");
     ObjectInputStream objectInputStream = null;

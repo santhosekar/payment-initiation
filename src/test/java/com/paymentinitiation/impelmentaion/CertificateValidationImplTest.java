@@ -64,7 +64,7 @@ public class CertificateValidationImplTest {
   @Test
   public void checkWhiteListedCertificate() throws Exception {
 
-    assert (certificateValidation.CheckValidCertificate(encodedPublicKey, encodedSignature,
+    assert (certificateValidation.checkValidCertificate(encodedPublicKey, encodedSignature,
         paymentDetails, "123-123-456"));
 
   }
@@ -72,7 +72,7 @@ public class CertificateValidationImplTest {
   @Test(expected = Exception.class)
   public void checkWhiteListedImproper() throws Exception {
 
-    assert (certificateValidation.CheckValidCertificate(wrongPublicKey, encodedSignature,
+    assert (certificateValidation.checkValidCertificate(wrongPublicKey, encodedSignature,
         paymentDetails, "123-123-456"));
 
   }
@@ -80,7 +80,7 @@ public class CertificateValidationImplTest {
   @Test(expected = UnknownCertificateException.class)
   public void checkWhiteOtherCN() throws Exception {
 
-    assert (certificateValidation.CheckValidCertificate(otherCNPublicKey, encodedSignature,
+    assert (certificateValidation.checkValidCertificate(otherCNPublicKey, encodedSignature,
         paymentDetails, "123-123-456"));
 
   }
