@@ -1,8 +1,5 @@
 package com.paymentinitiation.implementation;
 
-import static com.paymentinitiation.constant.PaymentInitiationConstant.CN_SANDBOX_TPP;
-import static com.paymentinitiation.constant.PaymentInitiationConstant.SHA_1_WITH_RSA;
-
 import java.io.*;
 import java.security.*;
 import java.security.cert.CertificateFactory;
@@ -22,6 +19,8 @@ import com.paymentinitiation.exception.UnknownCertificateException;
 import com.paymentinitiation.model.PaymentDetails;
 import com.paymentinitiation.service.CertificateValidation;
 
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
+
 @Component
 public class CertificateValidationImpl implements CertificateValidation {
 
@@ -37,7 +36,7 @@ public class CertificateValidationImpl implements CertificateValidation {
     ObjectInputStream objectInputStream = null;
     try {
       byte[] decoded = DatatypeConverter.parseBase64Binary(certificate);
-      CertificateFactory fac = CertificateFactory.getInstance("X509");
+      CertificateFactory fac = CertificateFactory.getInstance(X509);
       InputStream in = new ByteArrayInputStream(decoded);
       X509Certificate cert = (X509Certificate) fac.generateCertificate(in);
       PublicKey publicKey = cert.getPublicKey();
