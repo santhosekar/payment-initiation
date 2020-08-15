@@ -38,5 +38,33 @@ Payment-initiation service help to  validate the below things:
  - request body:
     {"debtorIBAN":"NL02RABO0000001555","creditorIBAN":"NL94ABNA1008270121","amount":"1","currency":"EUR"}
   
+  ## Behind the logic
+
+```python
+----------------- Decode signature--------------------------------
+  byte[] byteSignature = Base64.getDecoder().decode(signature);
+        objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteSignature));
+        certificateList = (List<byte[]>) objectInputStream.readObject();
+------------------------- Verify signature -------------------
+verifySignature(certificateList.get(0), certificateList.get(1), publicKey)
+
+
+---------  Compare the hash with request body-------
+
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    byte[] payLoadByte = md.digest(convertObjectIntoBytes(paymentDetails));
+    String paymentHex = paymentId + bytesToHex(payLoadByte);
+    if (paymentHex.equalsIgnoreCase(encryptedHash)) {
+      return true;
+    } else {
+      throw new InvalidCertificateException();
+    }
+
+refer: CertificateValidationImplTest class.
+
+
+
+```
+
   
   
