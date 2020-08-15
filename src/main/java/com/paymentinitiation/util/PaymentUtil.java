@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -39,28 +41,22 @@ public class PaymentUtil {
   Logger logger = LoggerFactory.getLogger(PaymentUtil.class);
   String violationFields = null;
 
-  private  byte[] convertObjectIntoBytes(PaymentDetails paymentDetails) throws Exception {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    ObjectOutputStream out = null;
-    try {
-      out = new ObjectOutputStream(bos);
-      out.writeObject(paymentDetails);
-      out.flush();
-      return bos.toByteArray();
-    } catch (Exception ex) {
-      if (out != null) {
-        out.close();
-      }
-      bos.close();
-      throw new GeneralException(ex.getMessage());
-    }
-  }
 
   public Integer getSumValue(String account) {
     logger.debug(ENTERING_METHOD_NAME_IS, "getSumValue");
     return Arrays.stream(account.split("")).filter(s -> s.matches("\\d+"))
         .mapToInt(Integer::valueOf).sum();
   }
+
+  private String bytesToHex(byte[] bytes) {
+    logger.debug(ENTERING_METHOD_NAME_IS, "bytesToHex");
+    return IntStream
+        .range(0, bytes.length).collect(StringBuilder::new,
+            (sb, i) -> new Formatter(sb).format("%02x", bytes[i] & 0xff), StringBuilder::append)
+        .toString();
+
+  }
+
 
   public ValidationResponse getViolations(PaymentDetails paymentDetails) {
     logger.debug(ENTERING_METHOD_NAME_IS, "getViolationsCount");
@@ -130,14 +126,22 @@ public class PaymentUtil {
     }
   }
 
-  private String bytesToHex(byte[] bytes) {
-    logger.debug(ENTERING_METHOD_NAME_IS, "bytesToHex");
-    StringBuilder sb = new StringBuilder();
-    for (byte b : bytes) {
-      sb.append(String.format("%02x", b));
-    }
-    return sb.toString();
-  }
 
+  private byte[] convertObjectIntoBytes(PaymentDetails paymentDetails) throws Exception {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectOutputStream out = null;
+    try {
+      out = new ObjectOutputStream(bos);
+      out.writeObject(paymentDetails);
+      out.flush();
+      return bos.toByteArray();
+    } catch (Exception ex) {
+      if (out != null) {
+        out.close();
+      }
+      bos.close();
+      throw new GeneralException(ex.getMessage());
+    }
+  }
 
 }

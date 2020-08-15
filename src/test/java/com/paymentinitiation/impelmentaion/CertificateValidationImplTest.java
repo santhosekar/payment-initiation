@@ -59,7 +59,7 @@ public class CertificateValidationImplTest {
     paymentDetails.setDebtorIBAN("NL02RABO0000001555");
     paymentDetails.setCreditorIBAN("NL94ABNA1008270121");
     paymentDetails.setCurrency("EUR");
-      paymentDetails.setAmount("1");
+    paymentDetails.setAmount("1");
     byte[] messageHash = md.digest(signUtil.convertObjectIntoBytes(paymentDetails));
     String concat = "29318e25-cebd-498c-888a-f77672f66449" + bytesToHex(messageHash);
     byte[] signature = signUtil.message(concat, privateKey);
