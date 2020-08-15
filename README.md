@@ -17,6 +17,8 @@ Payment-initiation service help to  validate the below things:
 
 -IntelliJ
 
+-Java8
+
 ### Run the application
 
  -  First gradle build will make common library to be compiled and ready to use.
