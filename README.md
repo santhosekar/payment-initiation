@@ -27,6 +27,10 @@ Payment-initiation service help to  validate the below things:
 
   - Via postman:
   
+  URL:
+  
+ -  POST: localhost:8080/initiate-payment
+  
   example: 
   -  X-Request-Id - 29318e25-cebd-498c-888a-f77672f66449
   
