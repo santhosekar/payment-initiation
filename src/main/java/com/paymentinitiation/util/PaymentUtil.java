@@ -2,7 +2,10 @@ package com.paymentinitiation.util;
 
 import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -22,6 +25,7 @@ import com.paymentinitiation.enums.ErrorReasonCode;
 import com.paymentinitiation.enums.TransactionStatus;
 import com.paymentinitiation.exception.AmountLimitExceedException;
 import com.paymentinitiation.exception.GeneralException;
+import com.paymentinitiation.exception.InvalidCertificateException;
 import com.paymentinitiation.exception.InvalidRequestException;
 import com.paymentinitiation.implementation.CertificateValidationImpl;
 import com.paymentinitiation.model.PaymentDetails;
@@ -34,6 +38,23 @@ public class PaymentUtil {
   public CertificateValidationImpl certificateValidation;
   Logger logger = LoggerFactory.getLogger(PaymentUtil.class);
   String violationFields = null;
+
+  private  byte[] convertObjectIntoBytes(PaymentDetails paymentDetails) throws Exception {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectOutputStream out = null;
+    try {
+      out = new ObjectOutputStream(bos);
+      out.writeObject(paymentDetails);
+      out.flush();
+      return bos.toByteArray();
+    } catch (Exception ex) {
+      if (out != null) {
+        out.close();
+      }
+      bos.close();
+      throw new GeneralException(ex.getMessage());
+    }
+  }
 
   public Integer getSumValue(String account) {
     logger.debug(ENTERING_METHOD_NAME_IS, "getSumValue");
@@ -91,6 +112,26 @@ public class PaymentUtil {
       throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.getReasonCode());
     }
 
+  }
+
+  public boolean checkCorrectHashValue(PaymentDetails paymentDetails, String paymentId,
+      String encryptedHash) throws Exception {
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    byte[] payLoadByte = md.digest(convertObjectIntoBytes(paymentDetails));
+    String paymentHex = paymentId + bytesToHex(payLoadByte);
+    if (paymentHex.equalsIgnoreCase(encryptedHash)) {
+      return true;
+    } else {
+      throw new InvalidCertificateException();
+    }
+  }
+
+  private String bytesToHex(byte[] bytes) {
+    StringBuilder sb = new StringBuilder();
+    for (byte b : bytes) {
+      sb.append(String.format("%02x", b));
+    }
+    return sb.toString();
   }
 
 

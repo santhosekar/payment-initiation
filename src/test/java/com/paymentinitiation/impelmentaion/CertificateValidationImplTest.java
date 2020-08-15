@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.paymentinitiation.exception.InvalidCertificateException;
 import com.paymentinitiation.exception.UnknownCertificateException;
 import com.paymentinitiation.implementation.CertificateValidationImpl;
 import com.paymentinitiation.model.PaymentDetails;
@@ -36,6 +37,14 @@ public class CertificateValidationImplTest {
   String otherCNPublicKey =
       "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlDeFRDQ0FhMmdBd0lCQWdJRVJPSEI2VEFOQmdrcWhraUc5dzBCQVFzRkFEQVRNUkV3RHdZRFZRUURFd2hDDQpZV1ZzWkhWdVp6QWVGdzB5TURBNE1UUXhNRFEyTWpOYUZ3MHlNVEE0TVRReE1EUTJNak5hTUJNeEVUQVBCZ05WDQpCQU1UQ0VKaFpXeGtkVzVuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFoVmk0DQprTnZFS25pR1B1R2h0cVVzelRCL1VqTDY4cDV1MDNCMVBRMFd5Y2xFcEF6TUpyMmJqdk5BaENnYVY0MWVrcVVEDQpFSGlXR2srSXpZbklDK0xTWTRNYWhiQTRmRW41cEM3eDlsbjJYdDJkN2UvZTIzSy9iSWRYZ1NsaWhmeUVKYTFtDQptOVZkeFJ6Y2ZsalAvK0RDRnkrMVhQcFFNV1FLRko0Wmdoa1ZhN0tDR3NsVHZVSnArWWI5ZjhxcjI2UFlvVEZNDQpzbE5xQm5pT1RmY0lOa0xhc0Mxekk2VWp5VUdDOFZZNWxwMmdOTCtvdUM3WEZEdXNmWGZQMVRBY2YvMFJ1bEhVDQpNRGJ4UHlRUnJObHNCVUEydndGaFp2K1Rsays5ejN0ZzVSNENuVGFzU2hsWkZBVXd0Qms2eVBWUTNEZk5pU3NwDQpETDhkTTFqclVpTkZwdEo3d3dJREFRQUJveUV3SHpBZEJnTlZIUTRFRmdRVXY3bzdwVTY4K1o3dWY5MnY5aFhFDQptTFM2dXF3d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFEaEJLQmtwQUJ5TnZsWWErVldzOGlWSG5jNjMwVFd1DQpjVjdyMVNpcDFNVEZWL1R0bXd2VzBCU29HU012QWJxNGZ5eGs2cTBJUGh5VFFtekVJT2IxeE5HS3BrdWJTK0ZjDQpONHlJdWQvVElaY2txZTlqYjRVVUlnQVFTMkxKU2tyQ2piUU1uVXlTaGw0OWFtYXBVdm1VTzVPcVMvT205NERwDQpyTm03UVZVK2I0bkgxMWNRK2txdTY2ZDJFazBxZlhKUUdDbEJIVGg2T29Cd01pT1dYT3B1aGhlQklSNDlBYlpZDQp0MkpBUm9pcmFDcU1vbjlwRXlIbkhBWjBVMlM0ZTNVTlhETmd2QmY5WmFFR1VXNnJjRjFZWGhTYTY2VGRjVDBZDQozdVpYL21ZNVdQTm9vSXhUaUduMjJBYVBObS9uM1MzWUVyd0JjdzMzNTFDQWMvejNteXNEbUxNPQ0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ0K";
 
+  private static String bytesToHex(byte[] bytes) {
+    StringBuilder sb = new StringBuilder();
+    for (byte b : bytes) {
+      sb.append(String.format("%02x", b));
+    }
+    return sb.toString();
+  }
+
   @Before
   public void setup() throws Exception {
     KeyStore keyStore = KeyStore.getInstance("PKCS12");
@@ -46,26 +55,22 @@ public class CertificateValidationImplTest {
     PrivateKey privateKey = (PrivateKey) keyStore.getKey("senderKeyPair", "changeit".toCharArray());
 
     MessageDigest md = MessageDigest.getInstance("SHA-256");
-    PaymentDetails paymentDetails = new PaymentDetails();
+    paymentDetails = new PaymentDetails();
     paymentDetails.setDebtorIBAN("NL02RABO0000001555");
     paymentDetails.setCreditorIBAN("NL94ABNA1008270121");
     paymentDetails.setCurrency("EUR");
-    paymentDetails.setAmount("1");
-    md.update(signUtil.convertObjectIntoBytes(paymentDetails));
-    byte[] messageHash = md.digest();
-    String concat = "123-123-456" + messageHash;
+      paymentDetails.setAmount("1");
+    byte[] messageHash = md.digest(signUtil.convertObjectIntoBytes(paymentDetails));
+    String concat = "29318e25-cebd-498c-888a-f77672f66449" + bytesToHex(messageHash);
     byte[] signature = signUtil.message(concat, privateKey);
     encodedSignature = Base64.getEncoder().encodeToString(signature);
-
-
-
   }
 
   @Test
   public void checkWhiteListedCertificate() throws Exception {
 
     assert (certificateValidation.checkValidCertificate(encodedPublicKey, encodedSignature,
-        paymentDetails, "123-123-456"));
+        paymentDetails, "29318e25-cebd-498c-888a-f77672f66449"));
 
   }
 
@@ -73,7 +78,7 @@ public class CertificateValidationImplTest {
   public void checkWhiteListedImproper() throws Exception {
 
     assert (certificateValidation.checkValidCertificate(wrongPublicKey, encodedSignature,
-        paymentDetails, "123-123-456"));
+        paymentDetails, "29318e25-cebd-498c-888a-f77672f66449"));
 
   }
 
@@ -81,7 +86,15 @@ public class CertificateValidationImplTest {
   public void checkWhiteOtherCN() throws Exception {
 
     assert (certificateValidation.checkValidCertificate(otherCNPublicKey, encodedSignature,
-        paymentDetails, "123-123-456"));
+        paymentDetails, "29318e25-cebd-498c-888a-f77672f66449"));
+
+  }
+
+  @Test(expected = InvalidCertificateException.class)
+  public void checkInvalidPaymentId() throws Exception {
+
+    assert (certificateValidation.checkValidCertificate(encodedPublicKey, encodedSignature,
+        paymentDetails, "29318e25-cebd-498c-888a-f77672f66252"));
 
   }
 

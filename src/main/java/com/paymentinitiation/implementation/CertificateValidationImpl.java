@@ -1,6 +1,11 @@
 package com.paymentinitiation.implementation;
 
-import java.io.*;
+import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -11,15 +16,16 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.paymentinitiation.enums.ErrorReasonCode;
 import com.paymentinitiation.exception.GeneralException;
+import com.paymentinitiation.exception.InvalidCertificateException;
 import com.paymentinitiation.exception.UnknownCertificateException;
 import com.paymentinitiation.model.PaymentDetails;
 import com.paymentinitiation.service.CertificateValidation;
-
-import static com.paymentinitiation.constant.PaymentInitiationConstant.*;
+import com.paymentinitiation.util.PaymentUtil;
 
 @Component
 public class CertificateValidationImpl implements CertificateValidation {
@@ -28,6 +34,8 @@ public class CertificateValidationImpl implements CertificateValidation {
 
   List<byte[]> certificateList;
   CertificateFactory certificateFactory;
+  @Autowired
+  PaymentUtil paymentUtil;
 
   @Override
   public boolean checkValidCertificate(String certificate, String signature,
@@ -47,11 +55,18 @@ public class CertificateValidationImpl implements CertificateValidation {
         objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteSignature));
         certificateList = (List<byte[]>) objectInputStream.readObject();
         objectInputStream.close();
+        if (verifySignature(certificateList.get(0), certificateList.get(1), publicKey)) {
 
-        return verifySignature(certificateList.get(0), certificateList.get(1), publicKey);
+          return paymentUtil.checkCorrectHashValue(paymentDetails, paymentId,
+              new String(certificateList.get(0)));
+        } else {
+          throw new InvalidCertificateException(ErrorReasonCode.INVALID_SIGNATURE.getReasonCode());
+        }
       }
     } catch (UnknownCertificateException e) {
       throw new UnknownCertificateException(ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
+    } catch (InvalidCertificateException e) {
+      throw new InvalidCertificateException(ErrorReasonCode.INVALID_SIGNATURE.getReasonCode());
     } catch (Exception e) {
 
       logger.info("CheckValidCertificate getting exception : {}",
@@ -76,6 +91,5 @@ public class CertificateValidationImpl implements CertificateValidation {
   }
 
 
- 
 
 }
