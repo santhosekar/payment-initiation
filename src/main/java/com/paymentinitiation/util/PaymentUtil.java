@@ -93,6 +93,7 @@ public class PaymentUtil {
     if (amount > 0 && (getSumValue(debitIban) % paymentDetails.getDebtorIBAN().length()) == 0) {
       return true;
     } else {
+      logger.info("isValidLimit getting exception : {}", paymentDetails);
       throw new AmountLimitExceedException(ErrorReasonCode.LIMIT_EXCEEDED.getReasonCode());
     }
   }
@@ -109,6 +110,7 @@ public class PaymentUtil {
           new ResponseCode(TRANSACTION_CODE, TransactionStatus.ACCEPTED.getStatus()),
           HttpStatus.CREATED);
     } else {
+      logger.info("initiatePaymentRequest getting exception : {}", paymentDetails);
       throw new GeneralException(ErrorReasonCode.GENERAL_ERROR.getReasonCode());
     }
 
@@ -116,17 +118,20 @@ public class PaymentUtil {
 
   public boolean checkCorrectHashValue(PaymentDetails paymentDetails, String paymentId,
       String encryptedHash) throws Exception {
+    logger.debug(ENTERING_METHOD_NAME_IS, "checkCorrectHashValue");
     MessageDigest md = MessageDigest.getInstance("SHA-256");
     byte[] payLoadByte = md.digest(convertObjectIntoBytes(paymentDetails));
     String paymentHex = paymentId + bytesToHex(payLoadByte);
     if (paymentHex.equalsIgnoreCase(encryptedHash)) {
       return true;
     } else {
+      logger.info("checkCorrectHashValue getting exception : {}", paymentId);
       throw new InvalidCertificateException();
     }
   }
 
   private String bytesToHex(byte[] bytes) {
+    logger.debug(ENTERING_METHOD_NAME_IS, "bytesToHex");
     StringBuilder sb = new StringBuilder();
     for (byte b : bytes) {
       sb.append(String.format("%02x", b));
