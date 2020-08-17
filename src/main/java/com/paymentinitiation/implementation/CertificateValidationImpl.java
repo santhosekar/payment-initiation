@@ -58,7 +58,7 @@ public class CertificateValidationImpl implements CertificateValidation {
           break;
         }
       }
-      if (!commonName.equalsIgnoreCase(CN_SANDBOX_TPP)) {
+      if (commonName!=null && !commonName.equalsIgnoreCase(CN_SANDBOX_TPP)) {
         throw new UnknownCertificateException(ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
       } else {
         byte[] byteSignature = Base64.getDecoder().decode(signature);
