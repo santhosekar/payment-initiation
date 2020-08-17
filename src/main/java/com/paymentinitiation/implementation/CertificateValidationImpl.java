@@ -12,6 +12,8 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
 
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
@@ -42,13 +44,21 @@ public class CertificateValidationImpl implements CertificateValidation {
       PaymentDetails paymentDetails, String paymentId) throws IOException {
     logger.debug("Entering method name is : {}", "CheckValidCertificate");
     ObjectInputStream objectInputStream = null;
+    String commonName = null;
     try {
       byte[] decoded = DatatypeConverter.parseBase64Binary(certificate);
       CertificateFactory fac = CertificateFactory.getInstance(X509);
       InputStream in = new ByteArrayInputStream(decoded);
       X509Certificate cert = (X509Certificate) fac.generateCertificate(in);
       PublicKey publicKey = cert.getPublicKey();
-      if (!cert.getIssuerDN().getName().equalsIgnoreCase(CN_SANDBOX_TPP)) {
+      LdapName ln = new LdapName(cert.getIssuerDN().getName());
+      for(Rdn rdn : ln.getRdns()) {
+        if(rdn.getType().equalsIgnoreCase(CN)) {
+           commonName=rdn.getValue().toString();
+          break;
+        }
+      }
+      if (!commonName.equalsIgnoreCase(CN_SANDBOX_TPP)) {
         throw new UnknownCertificateException(ErrorReasonCode.UNKNOWN_CERTIFICATE.getReasonCode());
       } else {
         byte[] byteSignature = Base64.getDecoder().decode(signature);

@@ -7,7 +7,9 @@ public final class PaymentInitiationConstant {
   public static final String X509 = "X509";
   public static final String SHA_1_WITH_RSA = "SHA1withRSA";
   public static final String ENTERING_METHOD_NAME_IS = "Entering method name is : {}";
-  public static final String CN_SANDBOX_TPP = "CN=Sandbox-TPP";
+  public static final String CN_SANDBOX_TPP = "Sandbox-TPP";
+  public static final String CN = "CN";
+
 
 
   PaymentInitiationConstant() {
